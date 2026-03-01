@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Défi : Classer les verbes selon leurs groupes </title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#141E30,#243B55);
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+color:white;
+}
+
+.game-container{
+width:95%;
+max-width:750px;
+min-height:95vh;
+background:rgba(0,0,0,0.7);
+border-radius:20px;
+padding:20px;
+display:flex;
+flex-direction:column;
+}
+
+h1{
+text-align:center;
+color:gold;
+margin-bottom:10px;
+}
+
+h2{
+text-align:center;
+color:gold;
+}
+
+.score-board{
+display:flex;
+justify-content:space-between;
+margin-bottom:10px;
+}
+
+#gameArea{
+flex:1;
+position:relative;
+}
+
+.word{
+position:absolute;
+top:0;
+left:50%;
+transform:translateX(-50%);
+font-size:24px;
+padding:10px 20px;
+border:2px solid gold;
+border-radius:10px;
+animation:fall linear forwards;
+}
+
+@keyframes fall{
+from{top:0;}
+to{top:80%;}
+}
+
+.buttons{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+}
+
+button{
+padding:12px;
+border:none;
+border-radius:10px;
+background:gold;
+font-weight:bold;
+cursor:pointer;
+}
+
+.start-btn{
+grid-column:span 2;
+background:#00d4ff;
+}
+
+@media(max-width:600px){
+.word{font-size:18px;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="game-container">
+<h1>Groupe scolaire Taghilast, Unité Hadria </h1>
+<h2>Défi : Classer les verbes selon leurs groupes </h2>
+
+
+<div class="score-board">
+<div>Score: <span id="score">0</span></div>
+<div>Meilleur score réalisé : <span id="bestScore">0</span></div>
+</div>
+
+<div id="gameArea"></div>
+
+<div class="buttons">
+<button onclick="checkAnswer('g1')">1er Groupe</button>
+<button onclick="checkAnswer('g2')">2e Groupe</button>
+<button onclick="checkAnswer('g3')">3e Groupe</button>
+<button class="start-btn" onclick="startGame()">Commencer</button>
+</div>
+
+</div>
+
+<script>
+
+
+// 1er groupe
+let g1 = [
+"aimer","adorer","apporter","arriver","attaquer","avancer","baisser","bâtir","blesser","changer",
+"chanter","chercher","commander","commencer","comparer","compter","continuer","corriger","couper","créer",
+"crier","décider","déclarer","demander","dépenser","dessiner","détester","développer","discuter","donner",
+"écouter","embrasser","employer","encourager","enregistrer","enseigner","entrer","envoyer","espérer","essayer",
+"étudier","éviter","expliquer","fermer","fêter","filmer","fixer","frapper","gagner","garder",
+"goûter","habiter","imaginer","inviter","jouer","juger","laisser","lancer","laver","lever",
+"louer","manger","manquer","marcher","marquer","mélanger","montrer","nager","noter","obliger",
+"occuper","organiser","oublier","parler","partager","passer","payer","penser","porter","poser",
+"pratiquer","préparer","présenter","proposer","quitter","raconter","regarder","remercier","rencontrer","répéter",
+"réserver","respecter","rester","retourner","rêver","saluer","sembler","signer","sonner","souhaiter",
+"terminer","tomber","tourner","travailler","traverser","tromper","trouver","utiliser","visiter","voyager"
+];
+
+// 2e groupe
+let g2 = [
+"abolir","accomplir","agir","agrandir","applaudir","avertir","bâtir","choisir","convertir","démolir",
+"désobéir","établir","finir","fleurir","fournir","grandir","guérir","investir","jaunir","maigrir",
+"nourrir","obéir","punir","réagir","réfléchir","remplir","réunir","réussir","rougir","saisir",
+"subir","unir","vieillir","affaiblir","aplanir","approfondir","arrondir","assombrir","attendrir","blanchir",
+"bondir","convertir","définir","démunir","éclaircir","épanouir","épaissir","étourdir","faiblir","franchir",
+"garnir","grossir","investir","jaillir","ralentir","réjouir","salir","surgir","ternir","trahir"
+];
+
+// 3e groupe
+let g3 = [
+"être","avoir","aller","faire","venir","tenir","prendre","apprendre","comprendre","surprendre",
+"mettre","permettre","promettre","admettre","soumettre","dire","écrire","lire","conduire","produire",
+"traduire","réduire","nuire","boire","croire","devoir","pouvoir","vouloir","valoir","falloir",
+"savoir","voir","revoir","prévoir","recevoir","apercevoir","concevoir","ouvrir","offrir","souffrir",
+"couvrir","découvrir","cueillir","accueillir","recueillir","partir","sortir","servir","dormir","mentir",
+"sentir","vivre","suivre","mourir","naître","connaître","paraître","disparaître","reconnaître","apparaître",
+"battre","combattre","abattre","mettre","perdre","répondre","attendre","entendre","descendre","défendre",
+"vendre","rompre","interrompre","corrompre","coudre","moudre","résoudre","absoudre","courir","parcourir",
+"concourir","secourir","tenir","obtenir","soutenir","retenir","devenir","revenir","intervenir","prévenir",
+"peindre","craindre","plaindre","joindre","atteindre","éteindre","contraindre","vaincre","convaincre","inclure",
+"exclure","conclure","dissoudre","clore","éclore","fuir","haïr","ouïr"
+];
+
+
+
+function expandList(list){
+let expanded = [];
+for(let i=0;i<40;i++){ 
+expanded = expanded.concat(list);
+}
+return [...new Set(expanded)];
+}
+
+g1 = expandList(g1);
+g2 = expandList(g2);
+g3 = expandList(g3);
+
+const words = {
+g1: g1,
+g2: g2,
+g3: g3
+};
+
+let currentType=null;
+let score=0;
+let level=1;
+let fallDuration=10000;
+let timer=null;
+let gameActive=false;
+
+let bestScore=localStorage.getItem("bestVerbScore")||0;
+document.getElementById("bestScore").innerText=bestScore;
+
+function randomWord(){
+const types=["g1","g2","g3"];
+const randomType=types[Math.floor(Math.random()*types.length)];
+const wordList=words[randomType];
+const word=wordList[Math.floor(Math.random()*wordList.length)];
+return {word,type:randomType};
+}
+
+function createWord(){
+if(!gameActive) return;
+
+const data=randomWord();
+currentType=data.type;
+
+const wordElement=document.createElement("div");
+wordElement.classList.add("word");
+wordElement.innerText=data.word;
+wordElement.style.animationDuration=fallDuration+"ms";
+
+document.getElementById("gameArea").innerHTML="";
+document.getElementById("gameArea").appendChild(wordElement);
+
+if(timer) clearTimeout(timer);
+
+timer=setTimeout(()=>{
+if(gameActive) endGame();
+},fallDuration);
+}
+
+function checkAnswer(type){
+if(!gameActive) return;
+
+if(type===currentType){
+clearTimeout(timer);
+score++;
+fallDuration=Math.max(5000,fallDuration-10);
+updateScore();
+createWord();
+}else{
+endGame();
+}
+}
+
+function updateScore(){
+document.getElementById("score").innerText=score;
+}
+
+function startGame(){
+gameActive=true;
+score=0;
+fallDuration=10000;
+updateScore();
+createWord();
+}
+
+function endGame(){
+gameActive=false;
+if(score>bestScore){
+bestScore=score;
+localStorage.setItem("bestVerbScore",score);
+}
+document.getElementById("bestScore").innerText=bestScore;
+alert("Fin ! votre Score est : "+score);
+}
+
+</script>
+
+</body>
+</html>
